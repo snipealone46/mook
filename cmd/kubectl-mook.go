@@ -17,26 +17,16 @@ limitations under the License.
 package main
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/spf13/pflag"
-	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"k8s.io/sample-cli-plugin/pkg/cmd"
 )
 
 func main() {
 	flags := pflag.NewFlagSet("kubectl-mook", pflag.ExitOnError)
 	pflag.CommandLine = flags
-	fmt.Println("Hello World")
 
 	for index := 0; true; index++ {
-		lines := cmd.LivePodsInformation()
+		lines := cmd.DisplayPodStatuesLive()
 		cmd.LivePrint(lines)
-	}
-
-	root := cmd.NewCmdNamespace(genericiooptions.IOStreams{In: os.Stdin, Out: os.Stdout, ErrOut: os.Stderr})
-	if err := root.Execute(); err != nil {
-		os.Exit(1)
 	}
 }

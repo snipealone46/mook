@@ -1,19 +1,11 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
-	"strconv"
 	"time"
 
 	"github.com/fatih/color"
-
-	"context"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 type Color = color.Color
@@ -39,24 +31,6 @@ func ColorPrintLines(lines []string) {
 
 	for index := 0; index < len(lines); index++ {
 		colorIndex := index % len(colors)
-		colors[colorIndex].Println(lines[index] + " " + strconv.Itoa(index))
+		colors[colorIndex].Println(lines[index] + " ")
 	}
-}
-
-func LivePodsInformation() []string {
-	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
-	configOverrides := &clientcmd.ConfigOverrides{}
-	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
-
-	config, _ := kubeConfig.ClientConfig()
-	clientset, _ := kubernetes.NewForConfig(config)
-
-	ctx := context.Background()
-	pod, _ := clientset.CoreV1().Pods("staging-in-ab-trust-cns-monitor").List(ctx, metav1.ListOptions{})
-
-	var pods []string
-	for _, p := range pod.Items {
-		pods = append(pods, fmt.Sprintf("%s - %s - %s\n", p.ObjectMeta.Name, p.Status.Phase, p.Status.StartTime))
-	}
-	return pods
 }
