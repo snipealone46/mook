@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -42,19 +41,6 @@ func ColorPrintLines(lines []string) {
 		colorIndex := index % len(colors)
 		colors[colorIndex].Println(lines[index] + " " + strconv.Itoa(index))
 	}
-}
-
-// MockLines the functions that the plugin will generate for print
-func MockLines(count int) []string {
-	testText := "pod1 - running - live count:\npod2 - running - live count:\npod3 - running - live count:\npod4 - running - live count:\n"
-	testText = testText + strings.Repeat(testText, 3)
-	testOutput := strings.Split(testText, "\n")
-
-	for index := 0; index < len(testOutput); index++ {
-		testOutput[index] = testOutput[index] + strconv.Itoa(count)
-	}
-	return testOutput
-
 }
 
 func LivePodsInformation() []string {
