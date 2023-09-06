@@ -49,9 +49,11 @@ func DisplayPodStatuesLive(args []string) {
 	kubeClient := GetKubeClient()
 
 	// An empty string returns all namespaces
-	namespace := args[0]
-	if namespace == "" {
+	var namespace string
+	if len(args) == 0 || args[0] == "" {
 		namespace = "default"
+	} else {
+		namespace = args[0]
 	}
 
 	writer := uilive.New()
