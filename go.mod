@@ -5,7 +5,6 @@ go 1.21.0
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/fatih/color v1.15.0
-	github.com/gosuri/uilive v0.0.4
 	github.com/rodaine/table v1.1.0
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5

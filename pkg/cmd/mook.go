@@ -19,7 +19,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/gosuri/uilive"
 	"github.com/spf13/cobra"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -56,8 +55,8 @@ func DisplayPodStatuesLive(args []string) {
 		namespace = args[0]
 	}
 
-	writer := uilive.New()
-	writer.Start()
+	//writer := uilive.New()
+	//writer.Start()
 
 	pkg.ClearScreen()
 	for index := 0; true; index++ {
@@ -68,11 +67,11 @@ func DisplayPodStatuesLive(args []string) {
 		}
 		lines := pkg.GeneratePodSummaries(pods)
 
-		pkg.ColorPrintLines(lines, writer)
+		pkg.ColorPrintLines(lines)
 		time.Sleep(2 * time.Second)
 	}
 
-	writer.Stop()
+	//writer.Stop()
 }
 
 func GetKubeClient() *kubernetes.Clientset {

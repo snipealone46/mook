@@ -23,7 +23,7 @@ func GeneratePodSummaries(pods *v1.PodList) [][]string {
 		podInfoRow = append(podInfoRow, fmt.Sprintf("%v", pod.Name))
 		podInfoRow = append(podInfoRow, fmt.Sprintf("%v", pod.Status.Phase))
 		podInfoRow = append(podInfoRow, fmt.Sprintf("%v", pod.Status.ContainerStatuses[0].RestartCount))
-		podInfoRow = append(podInfoRow, fmt.Sprintf("%v", elapsed))
+		podInfoRow = append(podInfoRow, fmt.Sprintf("%v", elapsed.Truncate(time.Second)))
 		podInfoRow = append(podInfoRow, fmt.Sprintf("%v", pod.Status.ContainerStatuses[0].Ready))
 		if !pod.Status.ContainerStatuses[0].Ready {
 			statusDetails, _ := json.Marshal(pod.Status.ContainerStatuses[0].State)

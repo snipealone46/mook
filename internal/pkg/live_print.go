@@ -3,7 +3,6 @@ package pkg
 import (
 	"github.com/acarl005/stripansi"
 	"github.com/fatih/color"
-	"github.com/gosuri/uilive"
 	"github.com/rodaine/table"
 	"os"
 	"os/exec"
@@ -12,9 +11,10 @@ import (
 
 type Color = color.Color
 
-func ColorPrintLines(lines [][]string, writer *uilive.Writer) {
+func ColorPrintLines(lines [][]string) {
+	ClearScreen()
 	columnHeaderList := []interface{}{"PodName", "PodState", "RestartCount", "Age", "Ready?", "ExtraInfo"}
-	tbl := InitializeTable(columnHeaderList, writer)
+	tbl := InitializeTable(columnHeaderList)
 
 	colors := [...]*Color{
 		color.New(color.FgCyan),
@@ -43,11 +43,11 @@ func ClearScreen() {
 	cmd.Run()
 }
 
-func InitializeTable(columnHeaderList []interface{}, writer *uilive.Writer) table.Table {
+func InitializeTable(columnHeaderList []interface{}) table.Table {
 	headerFmt := color.New(color.Underline).SprintfFunc()
 
 	tbl := table.New(columnHeaderList...)
-	tbl.WithHeaderFormatter(headerFmt).WithWriter(writer).WithWidthFunc(func(s string) int {
+	tbl.WithHeaderFormatter(headerFmt).WithWidthFunc(func(s string) int {
 		return utf8.RuneCountInString(stripansi.Strip(s))
 	})
 	return tbl
