@@ -1,26 +1,23 @@
 package pkg
 
 import (
+	"github.com/acarl005/stripansi"
+	"github.com/fatih/color"
+	"github.com/gosuri/uilive"
+	"github.com/rodaine/table"
 	"os"
 	"os/exec"
-	"time"
-
-	"github.com/fatih/color"
+	"unicode/utf8"
 )
 
 type Color = color.Color
 
-func LivePrint(lines []string) {
-	cmd := exec.Command("clear")
-	cmd.Stdout = os.Stdout
-	cmd.Run()
+func ColorPrintLines(lines [][]string, writer *uilive.Writer) {
+	ClearScreen()
 
-	ColorPrintLines(lines)
+	columnHeaderList := []interface{}{"PodName", "PodState", "RestartCount", "Age", "Ready?", "ErrorDetails"}
+	tbl := InitializeTable(columnHeaderList, writer)
 
-	time.Sleep(2 * time.Second)
-}
-
-func ColorPrintLines(lines []string) {
 	colors := [...]*Color{
 		color.New(color.FgCyan),
 		color.New(color.FgYellow),
@@ -30,7 +27,29 @@ func ColorPrintLines(lines []string) {
 		color.New(color.FgBlue)}
 
 	for index := 0; index < len(lines); index++ {
+		row := lines[index]
+		coloredRow := make([]interface{}, len(row))
 		colorIndex := index % len(colors)
-		colors[colorIndex].Println(lines[index] + " ")
+		for rowIndex := 0; rowIndex < len(row); rowIndex++ {
+			coloredRow[rowIndex] = colors[colorIndex].Sprint(row[rowIndex])
+		}
+		tbl.AddRow(coloredRow...)
 	}
+	tbl.Print()
+}
+
+func ClearScreen() {
+	cmd := exec.Command("clear")
+	cmd.Stdout = os.Stdout
+	cmd.Run()
+}
+
+func InitializeTable(columnHeaderList []interface{}, writer *uilive.Writer) table.Table {
+	headerFmt := color.New(color.Underline).SprintfFunc()
+
+	tbl := table.New(columnHeaderList...)
+	tbl.WithHeaderFormatter(headerFmt).WithWriter(writer).WithWidthFunc(func(s string) int {
+		return utf8.RuneCountInString(stripansi.Strip(s))
+	})
+	return tbl
 }

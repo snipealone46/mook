@@ -19,6 +19,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/gosuri/uilive"
 	"github.com/spf13/cobra"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,6 +28,7 @@ import (
 	"k8s.io/sample-cli-plugin/internal/pkg"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 func TailPodStatuesLive() *cobra.Command {
@@ -35,9 +37,7 @@ func TailPodStatuesLive() *cobra.Command {
 		Short:        "Live Tail of Pod Information",
 		SilenceUsage: true,
 		RunE: func(c *cobra.Command, args []string) error {
-			for index := 0; true; index++ {
-				DisplayPodStatuesLive(args)
-			}
+			DisplayPodStatuesLive(args)
 			return nil
 		},
 	}
@@ -53,13 +53,23 @@ func DisplayPodStatuesLive(args []string) {
 	if namespace == "" {
 		namespace = "default"
 	}
-	pods, err := ListPods(namespace, kubeClient)
-	if err != nil {
-		fmt.Printf("Error getting pods: %v\n", err)
-		os.Exit(1)
+
+	writer := uilive.New()
+	writer.Start()
+
+	for index := 0; true; index++ {
+		pods, err := ListPods(namespace, kubeClient)
+		if err != nil {
+			fmt.Printf("Error getting pods: %v\n", err)
+			os.Exit(1)
+		}
+		lines := pkg.GeneratePodSummaries(pods)
+
+		pkg.ColorPrintLines(lines, writer)
+		time.Sleep(2 * time.Second)
 	}
-	lines := pkg.GeneratePodSummaries(pods)
-	pkg.LivePrint(lines)
+
+	writer.Stop()
 }
 
 func GetKubeClient() *kubernetes.Clientset {

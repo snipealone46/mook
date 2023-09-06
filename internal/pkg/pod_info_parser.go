@@ -13,18 +13,26 @@ const (
 	OutputColumnHeaders = "PodName - PodState - RestartCount - Age - Ready? - ErrorDetails"
 )
 
-func GeneratePodSummaries(pods *v1.PodList) []string {
-	podInfoLines := []string{OutputColumnHeaders}
+func GeneratePodSummaries(pods *v1.PodList) [][]string {
+	//podInfoRows := []string{OutputColumnHeaders}
+	var podInfoRows [][]string
 	for _, pod := range pods.Items {
 		elapsed := CalculatePodAge(pod)
-		podInfoLine := fmt.Sprintf("%v - %v - %v - %v - %v", pod.Name, pod.Status.Phase, pod.Status.ContainerStatuses[0].RestartCount, elapsed, pod.Status.ContainerStatuses[0].Ready)
+		var podInfoRow []string
+		podInfoRow = append(podInfoRow, fmt.Sprintf("%v", pod.Name))
+		podInfoRow = append(podInfoRow, fmt.Sprintf("%v", pod.Status.Phase))
+		podInfoRow = append(podInfoRow, fmt.Sprintf("%v", pod.Status.ContainerStatuses[0].RestartCount))
+		podInfoRow = append(podInfoRow, fmt.Sprintf("%v", elapsed))
+		podInfoRow = append(podInfoRow, fmt.Sprintf("%v", pod.Status.ContainerStatuses[0].Ready))
 		if !pod.Status.ContainerStatuses[0].Ready {
 			statusDetails, _ := json.Marshal(pod.Status.ContainerStatuses[0].State)
-			podInfoLine += " - " + string(statusDetails)
+			podInfoRow = append(podInfoRow, string(statusDetails))
+		} else {
+			podInfoRow = append(podInfoRow, "None")
 		}
-		podInfoLines = append(podInfoLines, podInfoLine)
+		podInfoRows = append(podInfoRows, podInfoRow)
 	}
-	return podInfoLines
+	return podInfoRows
 }
 
 func CalculatePodAge(pod v1.Pod) time.Duration {

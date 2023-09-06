@@ -5,6 +5,9 @@ module k8s.io/sample-cli-plugin
 go 1.20
 
 require (
+	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
+	github.com/gosuri/uilive v0.0.4
+	github.com/rodaine/table v1.1.0
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
 	k8s.io/client-go v0.0.0
