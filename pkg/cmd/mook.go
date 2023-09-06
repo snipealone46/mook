@@ -57,6 +57,7 @@ func DisplayPodStatuesLive(args []string) {
 	writer := uilive.New()
 	writer.Start()
 
+	pkg.ClearScreen()
 	for index := 0; true; index++ {
 		pods, err := ListPods(namespace, kubeClient)
 		if err != nil {

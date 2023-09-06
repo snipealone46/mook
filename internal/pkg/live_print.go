@@ -13,9 +13,7 @@ import (
 type Color = color.Color
 
 func ColorPrintLines(lines [][]string, writer *uilive.Writer) {
-	ClearScreen()
-
-	columnHeaderList := []interface{}{"PodName", "PodState", "RestartCount", "Age", "Ready?", "ErrorDetails"}
+	columnHeaderList := []interface{}{"PodName", "PodState", "RestartCount", "Age", "Ready?", "ExtraInfo"}
 	tbl := InitializeTable(columnHeaderList, writer)
 
 	colors := [...]*Color{
@@ -28,6 +26,7 @@ func ColorPrintLines(lines [][]string, writer *uilive.Writer) {
 
 	for index := 0; index < len(lines); index++ {
 		row := lines[index]
+
 		coloredRow := make([]interface{}, len(row))
 		colorIndex := index % len(colors)
 		for rowIndex := 0; rowIndex < len(row); rowIndex++ {
