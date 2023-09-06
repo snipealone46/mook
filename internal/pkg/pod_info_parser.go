@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"k8s.io/api/core/v1"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -26,7 +27,8 @@ func GeneratePodSummaries(pods *v1.PodList) [][]string {
 		podInfoRow = append(podInfoRow, fmt.Sprintf("%v", pod.Status.ContainerStatuses[0].Ready))
 		if !pod.Status.ContainerStatuses[0].Ready {
 			statusDetails, _ := json.Marshal(pod.Status.ContainerStatuses[0].State)
-			podInfoRow = append(podInfoRow, string(statusDetails))
+			wrapped := word_wrap(string(statusDetails), 60)
+			podInfoRow = append(podInfoRow, wrapped)
 		} else {
 			podInfoRow = append(podInfoRow, "None")
 		}
@@ -43,4 +45,25 @@ func CalculatePodAge(pod v1.Pod) time.Duration {
 	}
 	cTime := time.Now()
 	return cTime.Sub(startTime)
+}
+
+func word_wrap(text string, lineWidth int) string {
+	words := strings.Fields(strings.TrimSpace(text))
+	if len(words) == 0 {
+		return text
+	}
+	wrapped := words[0]
+	spaceLeft := lineWidth - len(wrapped)
+	for _, word := range words[1:] {
+		if len(word)+1 > spaceLeft {
+			wrapped += "\n" + word
+			spaceLeft = lineWidth - len(word)
+		} else {
+			wrapped += " " + word
+			spaceLeft -= 1 + len(word)
+		}
+	}
+
+	return wrapped
+
 }
