@@ -19,14 +19,15 @@ package main
 import (
 	"github.com/spf13/pflag"
 	"k8s.io/sample-cli-plugin/pkg/cmd"
+	"os"
 )
 
 func main() {
 	flags := pflag.NewFlagSet("kubectl-mook", pflag.ExitOnError)
 	pflag.CommandLine = flags
 
-	for index := 0; true; index++ {
-		lines := cmd.DisplayPodStatuesLive()
-		cmd.LivePrint(lines)
+	root := cmd.TailPodStatuesLive()
+	if err := root.Execute(); err != nil {
+		os.Exit(1)
 	}
 }

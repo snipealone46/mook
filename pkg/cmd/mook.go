@@ -18,58 +18,48 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
-	"time"
-
+	"github.com/spf13/cobra"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/sample-cli-plugin/internal/pkg"
+	"os"
+	"path/filepath"
 )
 
-const (
-	DateTimeFormat      = "2006-01-02 15:04:05 -0700 PDT"
-	OutputColumnHeaders = "PodName - PodState - RestartCount - Age - Ready? - ErrorDetails"
-)
+func TailPodStatuesLive() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:          "mook [flags]",
+		Short:        "Live Tail of Pod Information",
+		SilenceUsage: true,
+		RunE: func(c *cobra.Command, args []string) error {
+			for index := 0; true; index++ {
+				DisplayPodStatuesLive(args)
+			}
+			return nil
+		},
+	}
 
-func DisplayPodStatuesLive() []string {
+	return cmd
+}
+
+func DisplayPodStatuesLive(args []string) {
 	kubeClient := GetKubeClient()
 
 	// An empty string returns all namespaces
-	namespace := "twistlock"
+	namespace := args[0]
+	if namespace == "" {
+		namespace = "default"
+	}
 	pods, err := ListPods(namespace, kubeClient)
 	if err != nil {
 		fmt.Printf("Error getting pods: %v\n", err)
 		os.Exit(1)
 	}
-	return GeneratePodSummaries(pods)
-}
-
-func GeneratePodSummaries(pods *v1.PodList) []string {
-	podInfoLines := []string{OutputColumnHeaders}
-	for _, pod := range pods.Items {
-		elapsed := CalculatePodAge(pod)
-		podInfoLine := fmt.Sprintf("%v - %v - %v - %v - %v", pod.Name, pod.Status.Phase, pod.Status.ContainerStatuses[0].RestartCount, elapsed, pod.Status.ContainerStatuses[0].Ready)
-		if !pod.Status.ContainerStatuses[0].Ready {
-			statusDetails, _ := json.Marshal(pod.Status.ContainerStatuses[0].State)
-			podInfoLine += " - " + string(statusDetails)
-		}
-		podInfoLines = append(podInfoLines, podInfoLine)
-	}
-	return podInfoLines
-}
-
-func CalculatePodAge(pod v1.Pod) time.Duration {
-	startTime, err := time.Parse(DateTimeFormat, pod.Status.StartTime.String())
-	if err != nil {
-		fmt.Printf("Error converting time: %v\n", err)
-		os.Exit(1)
-	}
-	cTime := time.Now()
-	return cTime.Sub(startTime)
+	lines := pkg.GeneratePodSummaries(pods)
+	pkg.LivePrint(lines)
 }
 
 func GetKubeClient() *kubernetes.Clientset {
