@@ -18,7 +18,7 @@ package main
 
 import (
 	"github.com/spf13/pflag"
-	"k8s.io/sample-cli-plugin/pkg/cmd"
+	"mook/pkg/cmd"
 	"os"
 )
 
