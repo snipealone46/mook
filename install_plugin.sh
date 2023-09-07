@@ -1,10 +1,5 @@
 #!/bin/bash -l
 
-#search_dir=./cmd
-#for entry in "$search_dir"/*
-#do
-#  echo "$entry"
-#done
 echo "Resolving the mod dependencies"
 go mod tidy
 
@@ -16,6 +11,7 @@ if [ $? -ne 0 ]; then
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   exit 1
 fi
+
 echo "Installing the plugin..."
 rm -rf /usr/local/bin/kubectl-mook
 cp ./kubectl-mook /usr/local/bin
