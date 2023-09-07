@@ -1,7 +1,16 @@
 #!/bin/bash -l
 
+echo "Resolving the mod dependencies"
+go mod tidy
+
 echo "Building the plugin..."
 GO111MODULE="on" go build ./cmd/kubectl-mook.go
+if [ $? -ne 0 ]; then
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "Something is wrong with the build...Exiting"
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  exit 1
+fi
 
 echo "Installing the plugin..."
 rm -rf /usr/local/bin/kubectl-mook
